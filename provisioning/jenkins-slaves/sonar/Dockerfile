@@ -57,6 +57,6 @@ RUN  rm -R /opt/rh/rh-nodejs8 \
 
 ENV OPENSHIFT_JENKINS_JVM_ARCH=x86_64
 ENV PATH "$PATH:/usr/lib/sonar-scanner/" 
-ENV PATH "$PATH:/usr/local/nvm/versions/node/" $NODE_VERSION "/bin/" 
+ENV PATH "$PATH:/usr/local/nvm/versions/node/$NODE_VERSION/bin/" 
 
 USER 1001

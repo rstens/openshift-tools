@@ -4,8 +4,8 @@ FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
 
 EXPOSE 8080
 
-ENV SUMMARY="Jenkins slave with python 37, nodejs 8, Java, BDDStack" \
-    DESCRIPTION="Jenkins pipeline slave with python 37, nodejs 8, Java 11 and BDDStack installed. A veritable Swiss army knife"
+ENV SUMMARY="Jenkins slave with python 36, nodejs 8, Java, BDDStack" \
+    DESCRIPTION="Jenkins pipeline slave with python 36, nodejs 8, Java 11 and BDDStack installed. A veritable Swiss army knife"
 
 LABEL summary="$SUMMARY" \
     description="$DESCRIPTION" \
@@ -15,7 +15,7 @@ LABEL summary="$SUMMARY" \
     io.openshift.tags="builder,jenkins-jnlp-python,jenkins-jnlp-nodejs,jenkins-jnlp, jenkins-jnlp-bddstack, jenkins-jnlp-scan" \
     release="1"
 
-ENV PYTHON_VERSION=3.7 \
+ENV PYTHON_VERSION=3.6 \
     PATH=$HOME/.local/bin/:$PATH \
     PYTHONUNBUFFERED=1 \
     PYTHONIOENCODING=UTF-8 \
@@ -38,7 +38,7 @@ RUN yum repolist > /dev/null && \
     yum-config-manager --enable rhel-7-server-optional-rpms && \
     yum-config-manager --enable rhel-7-server-fastrack-rpms && \
     UNINSTALL_PKGS="java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.8.0-openjdk-headless.i686" &&\
-    INSTALL_PKGS="rh-python37 rh-python37-python-devel rh-python37-python-setuptools rh-python37-python-pip \
+    INSTALL_PKGS="rh-python36 rh-python36-python-devel rh-python36-python-setuptools rh-python36-python-pip \
     nss_wrapper httpd24 httpd24-httpd-devel httpd24-mod_ssl httpd24-mod_auth_kerb httpd24-mod_ldap httpd24-mod_session \
     atlas-devel gcc-gfortran libffi-devel libtool-ltdl rh-nodejs8 rh-nodejs8-nodejs-nodemon \
     java-11-openjdk java-11-openjdk-devel redhat-lsb libXScrnSaver gdk-pixbuf2 xorg-x11-server-Xvfb wget" && \

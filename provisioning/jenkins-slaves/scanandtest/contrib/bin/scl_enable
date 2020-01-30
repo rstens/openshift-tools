@@ -1,6 +1,6 @@
 # This will make the scl Python 3.7 collection binaries work out of box, as well as creating a virtualenv and activating it
 unset BASH_ENV PROMPT_COMMAND ENV
 source scl_source enable rh-nodejs8
-source scl_source enable rh-python37
+source scl_source enable rh-python36
 virtualenv /opt/app-root
 source /opt/app-root/bin/activate

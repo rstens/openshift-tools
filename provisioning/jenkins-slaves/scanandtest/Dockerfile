@@ -1,10 +1,4 @@
-FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
-
-# Note this is based mostly on https://github.com/sclorg/s2i-python-container/blob/master/3.5/Dockerfile.rhel7
-
-EXPOSE 8080
-
-ENV SUMMARY="Jenkins slave with python 36, nodejs 8, Java, BDDStack" \
+FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7 EXPOSE 8080 ENV SUMMARY="Jenkins slave with python 36, nodejs 8, Java, BDDStack" \
     DESCRIPTION="Jenkins pipeline slave with python 36, nodejs 8, Java 11 and BDDStack installed. A veritable Swiss army knife"
 
 LABEL summary="$SUMMARY" \
@@ -36,36 +30,35 @@ RUN yum repolist > /dev/null && \
     yum-config-manager --enable rhel-server-rhscl-7-rpms && \
     yum-config-manager --enable rhel-7-server-rpms && \
     yum-config-manager --enable rhel-7-server-optional-rpms && \
-    yum-config-manager --enable rhel-7-server-fastrack-rpms && \
-    UNINSTALL_PKGS="java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.8.0-openjdk-headless.i686" &&\
+    yum-config-manager --enable rhel-7-server-fastrack-rpms
+
+RUN UNINSTALL_PKGS="java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.8.0-openjdk-headless.i686" &&\
     INSTALL_PKGS="rh-python36 rh-python36-python-devel rh-python36-python-setuptools rh-python36-python-pip \
     nss_wrapper httpd24 httpd24-httpd-devel httpd24-mod_ssl httpd24-mod_auth_kerb httpd24-mod_ldap httpd24-mod_session \
     atlas-devel gcc-gfortran libffi-devel libtool-ltdl rh-nodejs8 rh-nodejs8-nodejs-nodemon \
     java-11-openjdk java-11-openjdk-devel redhat-lsb libXScrnSaver gdk-pixbuf2 xorg-x11-server-Xvfb wget" && \
-    ln -s /usr/lib/node_modules/nodemon/bin/nodemon.js /usr/bin/nodemon && \
-    yum remove -y $UNINSTALL_PKGS &&\
+    ln -s /usr/lib/node_modules/nodemon/bin/nodemon.js /usr/bin/nodemon
+
+RUN yum remove -y $UNINSTALL_PKGS &&\
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     # Remove redhat-logos (httpd dependency) to keep image size smaller.
     rpm -e --nodeps redhat-logos && \
-    yum clean all -y && \
-    # Get Google Chrome latest version
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
+    yum clean all -y
+
+# Get Google Chrome latest version
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
     yum -y localinstall google-chrome-stable_current_x86_64.rpm && \
     rm google-chrome-stable_current_x86_64.rpm && \
     if [ ! -d /home/jenkins/.pki ] ; then mkdir /home/jenkins/.pki; fi && \
     chmod 777 /home/jenkins/.pki
 
-# In order to drop the root user, we have to make some directories world
-# writable as OpenShift default security model is to run the container under
-# random UID.
 RUN mkdir -p /opt/app-root  && \
     chown -R 1001:0 /opt/app-root && \
-    chmod -R og+rwx /opt/app-root && \
-    # Obtain the installed Chrome version so that BDDStack can load the correct driver by querying the chromeversion and chromedriver files    
-    google-chrome --version | grep -o -m 1 -E "[0-9]{2,3}[^ ^a-z^A-Z^0-9^\.]*" | sed -n 1p >  /opt/app-root/chromeversion && \
-    wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE_`cat /opt/app-root/chromeversion` -O  /opt/app-root/chromedriver 
+    chmod -R og+rwx /opt/app-root
 
-ENV OPENSHIFT_JENKINS_JVM_ARCH=x86_64
+# Obtain the installed Chrome version so that BDDStack can load the correct driver by querying the chromeversion and chromedriver files    
+RUN google-chrome --version | grep -o -m 1 -E "[0-9]{2,3}[^ ^a-z^A-Z^0-9^\.]*" | sed -n 1p >  /opt/app-root/chromeversion && \
+    wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE_`cat /opt/app-root/chromeversion` -O  /opt/app-root/chromedriver 
 
 USER 1001
